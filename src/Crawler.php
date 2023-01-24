@@ -1072,6 +1072,11 @@ class Crawler extends Options
 		$url = $event->getEffectiveURL();
 
 		$options = new Options($request->getOptions());
+		if ($this->isPersistCurl() && $request->getMethod() == Method::GET) {
+			// Force the previously using curl handle to get back to using GET
+			$options->setCustomMethod(Method::GET);
+			$options->setOption(CURLOPT_HTTPGET, true);
+		}
 		$headers = $request->getHeaders() ?? $this->getHeaders();
 
 		if ($this->redirects_allowed && $request->getOption(CURLOPT_FOLLOWLOCATION) == false) {
@@ -1129,7 +1134,7 @@ class Crawler extends Options
 	 */
 	public function get(?string $url = null, ?array $query = null, ?string $referer = null)
 	{
-		return $this->newRequest($url, $query, $referer)->send();
+		return $this->newRequest($url, $query, $referer)->toGET()->send();
 	}
 
 	/**

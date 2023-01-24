@@ -93,7 +93,7 @@ class Options
 		if ($type !== null) {
 			$this->getHeaders()->setContentType($type);
 		}
-		return $this->setOption(CURLOPT_HTTPGET, false)->setOption(CURLOPT_POSTFIELDS, $data);
+		return $this->setOption(CURLOPT_POSTFIELDS, $data);
 	}
 
 	public function setPlainData(string $data): self
@@ -156,7 +156,7 @@ class Options
 
 	public function removeData(): self
 	{
-		return $this->setOption(CURLOPT_HTTPGET, true)->removeOption(CURLOPT_POSTFIELDS);
+		return $this->removeOption(CURLOPT_POSTFIELDS);
 	}
 
 	public function getReferer(): ?string

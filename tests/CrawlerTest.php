@@ -151,6 +151,9 @@ final class CrawlerTest extends TestCase
 		$result = $crawler->post('post', $data);
 		$this->assertSame($data, $result['json']);
 
+		$result = $crawler->get('get');
+		$this->assertSame($crawler->normalizeURL('get'), $result['url']);
+
 		$request = $crawler->newRequest('post');
 		$request->toPOST($data, DataType::FORM);
 		$result = $request->send();
@@ -167,6 +170,9 @@ final class CrawlerTest extends TestCase
 		$this->assertSame($form_data, $result['form']);
 		$headers = $this->getHeaders($result);
 		$this->assertSame('application/x-www-form-urlencoded', $headers['Content-Type']);
+
+		$result = $crawler->newRequest('get')->send();
+		$this->assertSame($crawler->normalizeURL('get'), $result['url']);
 	}
 
 	/**
@@ -290,8 +296,6 @@ final class CrawlerTest extends TestCase
 	/**
 	 * @covers Crawler::setAuthority
 	 * @covers Crawler::getAuthority
-	 *
-	 * @group current
 	 */
 	public function testAuth()
 	{
