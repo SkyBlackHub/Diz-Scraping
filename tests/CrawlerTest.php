@@ -92,6 +92,7 @@ final class CrawlerTest extends TestCase
 	/**
 	 * @covers Crawler::normalizeURL
 	 * @covers Crawler::setPath
+	 * @group current
 	 * @covers Crawler::setStrictPathHandling
 	 */
 	public function testNormalizeUL()
@@ -109,6 +110,8 @@ final class CrawlerTest extends TestCase
 		$this->assertSame('https://httpbin.org/foo?token=not-secret&test=me&bar=123', $crawler->normalizeURL('foo?bar=123&token=not-secret', ['test' => 'me']));
 
 		$this->assertSame('https://google.com/search', $crawler->normalizeURL('//google.com/search'));
+
+		$this->assertSame('https://sample.com/100%success', $crawler->normalizeURL('https://sample.com/100%success', null, false));
 
 		$crawler->setQuery(null);
 

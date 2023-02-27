@@ -64,6 +64,8 @@ class Crawler extends Options
 
 	private ?string $default_data_type = null;
 
+	private bool $encode_urls = true;
+
 	public function __construct(?string $domain = null, ?string $subdomain = null)
 	{
 		parent::__construct();
@@ -468,6 +470,23 @@ class Crawler extends Options
 		return $this;
 	}
 
+	public function isEncodeURLs(): bool
+	{
+		return $this->encode_urls;
+	}
+
+	/**
+	 * By default, Crawler encodes all URLs during normalization before each request.
+	 * If all URLs will be already encoded, then this option should be disabled.
+	 * @param bool $encode_urls
+	 * @return static
+	 */
+	public function setEncodeURLs(bool $encode_urls): self
+	{
+		$this->encode_urls = $encode_urls;
+		return $this;
+	}
+
 	/* --------------------------------------------------------[ URL routines ] */
 
 	/**
@@ -509,11 +528,18 @@ class Crawler extends Options
 	 * Query parameters will be merged in the next sequence - "crawler default" <- "query parameter" <- "parsed from url"
 	 * @param string $url The target URL
 	 * @param array|null $query Additional query parameters
+	 * @param bool|null $encode Encode URL before parsing, if null then use the default value (Crawler::isEncodeURLs)
 	 * @return string Normalized URL
 	 */
-	public function normalizeURL(string $url, ?array $query = null): string
+	public function normalizeURL(string $url, ?array $query = null, ?bool $encode = null): string
 	{
-		$url = parse_url(URLKit::encode($url));
+		if ($encode === null) {
+			$encode = $this->isEncodeURLs();
+		}
+		if ($encode) {
+			$url = URLKit::encode($url);
+		}
+		$url = parse_url($url);
 
 		if ($host = ($url['host'] ?? null)) {
 			if (TextKit::endsWith($host, $this->getHost(), false) == false) {
