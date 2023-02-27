@@ -924,8 +924,8 @@ class Crawler extends Options
 		$curl = $this->getCurlInstance();
 
 		if (curl_setopt_array($curl, $options->getOptions()) == false) {
-			$error = curl_error($curl);
-			return $this->handleCurlError(null, $error, curl_errno($curl) ?: curl_strerror($error));
+			$error = curl_errno($curl);
+			return $this->handleCurlError(null, curl_error($curl) ?: curl_strerror($error), $error);
 		}
 
 		if ($url !== null) {
@@ -967,8 +967,8 @@ class Crawler extends Options
 		$content = ob_get_clean();
 
 		if ($result === false) {
-			$error = curl_error($curl);
-			$error_message = curl_errno($curl) ?: curl_strerror($error);
+			$error = curl_errno($curl);
+			$error_message = curl_error($curl) ?: curl_strerror($error);
 		}
 
 		curl_setopt($curl, CURLOPT_HEADERFUNCTION, null);
@@ -986,7 +986,7 @@ class Crawler extends Options
 		$url = curl_getinfo($curl, CURLINFO_EFFECTIVE_URL);
 
 		if ($result === false) {
-			return $this->handleCurlError($url, $error, $error_message);
+			return $this->handleCurlError($url, $error_message, $error);
 		}
 
 		if ($status_code == null) {
