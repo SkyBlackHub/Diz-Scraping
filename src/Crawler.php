@@ -66,6 +66,8 @@ class Crawler extends Options
 
 	private bool $encode_urls = true;
 
+	private ?int $query_numeric_indices_mode = null;
+
 	public function __construct(?string $domain = null, ?string $subdomain = null)
 	{
 		parent::__construct();
@@ -346,6 +348,17 @@ class Crawler extends Options
 		return $this;
 	}
 
+	public function getQueryNumericIndicesMode(): ?int
+	{
+		return $this->query_numeric_indices_mode;
+	}
+
+	public function setQueryNumericIndicesMode(?int $query_numeric_indices_mode): self
+	{
+		$this->query_numeric_indices_mode = $query_numeric_indices_mode;
+		return $this;
+	}
+
 	/* -----------------------------------------------------------[ pipelines ] */
 
 	public function getPipelines(): array
@@ -514,7 +527,7 @@ class Crawler extends Options
 			if ($base_query = $this->getQuery()) {
 				$query = array_merge($base_query, $query);
 			}
-			$path .= '?' . URLKit::buildQuery($query);
+			$path .= '?' . URLKit::buildQuery($query, null, $this->query_numeric_indices_mode);
 		}
 
 		if ($https === null) {
@@ -545,7 +558,7 @@ class Crawler extends Options
 			if (TextKit::endsWith($host, $this->getHost(), false) == false) {
 				return URLKit::compose($url + [
 					'scheme' => $this->isSecured() ? 'https' : 'http'
-				]);
+				], ['numeric_indices_mode' => $this->query_numeric_indices_mode]);
 			}
 		}
 
@@ -574,7 +587,7 @@ class Crawler extends Options
 		return URLKit::compose($url + [
 			'scheme' => $this->isSecured() ? 'https' : 'http',
 			'host' => $this->getHost()
-		]);
+		], ['numeric_indices_mode' => $this->query_numeric_indices_mode]);
 	}
 
 	/**

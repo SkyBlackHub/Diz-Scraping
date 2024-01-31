@@ -5,6 +5,7 @@ namespace Diz\Scraping\Tests;
 use Diz\Scraping\Cookies\Cookie;
 use Diz\Scraping\Enums\DataType;
 
+use Diz\Toolkit\Kits\URLKit;
 use PHPUnit\Framework\TestCase;
 
 use Diz\Scraping\Crawler;
@@ -74,6 +75,7 @@ final class CrawlerTest extends TestCase
 	}
 
 	/**
+	 * @testdox Compose URL
 	 * @covers Crawler::composeURL
 	 */
 	public function testComposeURL()
@@ -86,16 +88,22 @@ final class CrawlerTest extends TestCase
 		$this->assertSame('https://httpbin.org/test?foo=bar', $crawler->composeURL('test', ['foo' => 'bar']));
 		$this->assertSame('https://httpbin.org/test/?foo[bar]=1&foo[no]=0', $crawler->composeURL('test/', ['foo' => ['bar' => 1, 'no' => 0]]));
 		$this->assertSame('https://httpbin.org/test/?foo[]=a&foo[]=b&foo[]=c', $crawler->composeURL('test/', ['foo' => ['a', 'b', 'c']]));
+		$crawler->setQueryNumericIndicesMode(URLKit::QUERY_KEEP_NUMERIC_INDICES);
+		$this->assertSame('https://httpbin.org/test/?foo[0]=a&foo[1]=b&foo[2]=c', $crawler->composeURL('test/', ['foo' => ['a', 'b', 'c']]));
+		$crawler->setQueryNumericIndicesMode(URLKit::QUERY_FLAT_NUMERIC_INDICES);
+		$this->assertSame('https://httpbin.org/test/?foo=a&foo=b&foo=c', $crawler->composeURL('test/', ['foo' => ['a', 'b', 'c']]));
+		$crawler->setQueryNumericIndicesMode(null);
+		$this->assertSame('https://httpbin.org/test/?foo[]=a&foo[]=b&foo[]=c', $crawler->composeURL('test/', ['foo' => ['a', 'b', 'c']]));
 		$this->assertSame('http://www.google.com/search?q=foo', $crawler->composeURL('search', ['q' => 'foo'], 'www', false, 'google.com'));
 	}
 
 	/**
+	 * @testdox Normalize URL
 	 * @covers Crawler::normalizeURL
 	 * @covers Crawler::setPath
-	 * @group current
 	 * @covers Crawler::setStrictPathHandling
 	 */
-	public function testNormalizeUL()
+	public function testNormalizeURL()
 	{
 		$crawler = $this->instance();
 

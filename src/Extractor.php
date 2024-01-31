@@ -66,7 +66,7 @@ class Extractor
 			return $matches[$group] ?? null;
 		}
 		if (count($matches) == 1) {
-			return true;
+			return $matches[0];
 		}
 		if (count($matches) == 2) {
 			return $matches[1];
